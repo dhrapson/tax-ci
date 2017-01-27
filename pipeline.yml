@@ -20,6 +20,20 @@ resources:
     vars:
       tag_name: concourse
 
+- name: infra-base
+  type: terraform
+  source:
+    storage:
+      bucket: tax-aws-infrastructure
+      bucket_path: base/
+      region_name: eu-west-1
+      access_key_id: {{storage_aws_access_key}}
+      secret_access_key: {{storage_aws_secret_key}}
+    # the '//' indicates a sub-directory in a git repo
+    terraform_source: github.com/dhrapson/tax-aws-infrastructure//base
+    vars:
+      tag_name: concourse
+
 - name: tax-secrets
   type: git
   source:
@@ -31,7 +45,7 @@ jobs:
 - name: infra-inception-plan
   plan:
     - get: tax-secrets
-      trigger: false
+      trigger: true
     - put: infra-inception
       params:
         env_name: dhr
@@ -46,6 +60,30 @@ jobs:
     - get: tax-secrets
       trigger: false
     - put: infra-inception
+      params:
+        env_name: dhr
+        plan_run: true
+        var_file: tax-secrets/dhr-credentials.yml
+
+- name: infra-base-plan
+  plan:
+    - get: tax-secrets
+      trigger: false
+      passed: [infra-inception-apply]
+    - put: infra-base
+      params:
+        env_name: dhr
+        plan_only: true
+        var_file: tax-secrets/dhr-credentials.yml
+
+- name: infra-base-apply
+  plan:
+    - get: infra-base
+      trigger: true
+      passed: [infra-base-plan]
+    - get: tax-secrets
+      trigger: false
+    - put: infra-base
       params:
         env_name: dhr
         plan_run: true
