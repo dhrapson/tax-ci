@@ -1,0 +1,52 @@
+---
+resource_types:
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+
+resources:
+- name: infra-inception
+  type: terraform
+  source:
+    storage:
+      bucket: tax-aws-infrastructure
+      bucket_path: inception/
+      region_name: eu-west-1
+      access_key_id: {{storage_aws_access_key}}
+      secret_access_key: {{storage_aws_secret_key}}
+    # the '//' indicates a sub-directory in a git repo
+    terraform_source: github.com/dhrapson/tax-aws-infrastructure//inception
+    vars:
+      tag_name: concourse
+
+- name: tax-secrets
+  type: git
+  source:
+    uri: git@bitbucket.org:dhrapson/tax-secrets.git
+    branch: master
+    private_key: {{private_key}}
+
+jobs:
+- name: infra-inception-plan
+  plan:
+    - get: tax-secrets
+      trigger: false
+    - put: infra-inception
+      params:
+        env_name: dhr
+        plan_only: true
+        var_file: tax-secrets/dhr-credentials.yml
+
+- name: infra-inception-apply
+  plan:
+    - get: infra-inception
+      trigger: true
+      passed: [infra-inception-plan]
+    - get: tax-secrets
+      trigger: false
+    - put: infra-inception
+      params:
+        env_name: dhr
+        plan_run: true
+        var_file: tax-secrets/dhr-credentials.yml
