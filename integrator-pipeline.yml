@@ -64,3 +64,27 @@ jobs:
         env_name: dhr
         plan_run: true
         var_file: tax-secrets/dhr-credentials.yml
+
+- name: infra-client-plan
+  plan:
+    - get: tax-secrets
+      trigger: true
+      passed: [infra-integrator-apply]
+    - put: infra-client
+      params:
+        env_name: dhr
+        plan_only: true
+        var_file: tax-secrets/dhr-credentials.yml
+
+- name: infra-client-apply
+  plan:
+    - get: infra-client
+      trigger: true
+      passed: [infra-client-plan]
+    - get: tax-secrets
+      trigger: false
+    - put: infra-client
+      params:
+        env_name: dhr
+        plan_run: true
+        var_file: tax-secrets/dhr-credentials.yml
