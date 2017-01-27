@@ -2,8 +2,8 @@
 
 This repo holds the Concourse CI pipeline for the tax company.
 
-## Deploying the Pipeline
+## Deploying the Core Pipeline
 
 ```
-fly -t lite set-pipeline -p tax-ci -c pipeline.yml -l ../path/to/credentials.yml --var "private_key=$(cat ~/.ssh/id_rsa)"
+fly -t lite set-pipeline -p tax-core -c pipeline.yml -l ../path/to/credentials.yml --var "private_key=$(cat ~/.ssh/id_rsa)"
 ```
