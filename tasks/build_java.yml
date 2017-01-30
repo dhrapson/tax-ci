@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: maven}
+
+inputs:
+- name: tax-ci
+- name: s3notifier
+
+outputs:
+- name: target
+
+run:
+  path: tax-ci/scripts/build_java.sh
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  SMTP_USERNAME:
+  SMTP_PASSWORD:
+  EMAIL_FROM:
+  EMAIL_TO:
+  DROPBOX_ACCESS_TOKEN:
+  DROPBOX_PARENT_FOLDER: '/test'
