@@ -12,10 +12,10 @@ set -e
 : "${DROPBOX_PARENT_FOLDER?Need to set DROPBOX_PARENT_FOLDER}"
 build_dir=${S3NOTIFIER_REPO:=s3notifier}
 
-mkdir build
+mkdir buildoutput
 
 pushd $build_dir
   mvn clean verify
   mvn package
-  cp target/s3notifier-function.jar ../build/
+  cp target/s3notifier-function.jar ../buildoutput/
 popd

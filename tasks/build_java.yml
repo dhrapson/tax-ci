@@ -10,7 +10,7 @@ inputs:
 - name: s3notifier
 
 outputs:
-- name: build
+- name: buildoutput
 
 run:
   path: tax-ci/scripts/build_java.sh
