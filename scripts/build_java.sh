@@ -12,7 +12,9 @@ set -e
 : "${DROPBOX_PARENT_FOLDER?Need to set DROPBOX_PARENT_FOLDER}"
 build_dir=${S3NOTIFIER_REPO:=s3notifier}
 
-mkdir buildoutput
+if [ ! -d buildoutput ]; then
+  mkdir buildoutput
+fi
 
 pushd $build_dir
   mvn clean verify
